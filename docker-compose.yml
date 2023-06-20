@@ -1,0 +1,60 @@
+# Docker Compose file Reference (https://docs.docker.com/compose/compose-file/)
+
+version: '3.7'
+
+# Define services
+services:
+  # App backend service
+  app-server:
+    # Configuration for building the docker image for the backend service
+    build:
+      context: ecommerce-spring-boot # Use an image built from the specified dockerfile in the `ecommerce-spring-boot` directory.
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080" # Forward the exposed port 8080 on the container to port 8080 on the host machine
+    restart: always
+    depends_on: 
+      - db # This service depends on mysql. Start that first.
+    environment: # Pass environment variables to the service
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/ecommerce?serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 17091997     
+    networks:
+        - spring-boot-mysql-network
+
+  # Frontend Service 
+  app-client:
+    build:
+      context: ecommerce-typescript # Use an image built from the specified dockerfile in the `ecommerce-typescript` directory.
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_API_BASE_URL: http://127.0.0.1:8080
+    ports:
+      - "9090:80" # Forward the exposed port 80 on the container to port 80 on the host machine
+    restart: always
+    depends_on:
+      - app-server
+    networks:
+        - spring-boot-mysql-network
+
+  # Database Service (Mysql)
+  db:
+    image: mysql
+    ports:
+      - "3306:3306"
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      - MYSQL_DATABASE=ecommerce
+      - MYSQL_ROOT_PASSWORD=17091997
+    networks:
+        - spring-boot-mysql-network 
+  
+# Volumes
+volumes:
+  db-data:
+
+# Networks to be created to facilitate communication between containers
+networks:
+    spring-boot-mysql-network:
+        driver: bridge
