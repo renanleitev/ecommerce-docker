@@ -27,8 +27,6 @@ services:
     build:
       context: ecommerce-typescript # Use an image built from the specified dockerfile in the `ecommerce-typescript` directory.
       dockerfile: Dockerfile
-      args:
-        REACT_APP_API_BASE_URL: http://127.0.0.1:8080
     ports:
       - "9090:80" # Forward the exposed port 80 on the container to port 80 on the host machine
     restart: always
@@ -49,10 +47,6 @@ services:
       - MYSQL_ROOT_PASSWORD=17091997
     networks:
         - spring-boot-mysql-network 
-  
-# Volumes
-volumes:
-  db-data:
 
 # Networks to be created to facilitate communication between containers
 networks:
