@@ -24,3 +24,7 @@ Back End
 ## Para deletar os containers
 
 	docker compose down
+
+## Para deletar todos os containers
+
+	docker container prune -f
